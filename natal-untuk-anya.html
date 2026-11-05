@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Selamat Natal, Anya!</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Pacifico&display=swap">
+<style>
+:root{
+  --bg1:#fde8ee; --bg2:#e3f0ff; --ink:#3a1830; --muted:#7a5570; --card:#ffffff; --red:#d4264a; --gold:#f5b700; --green:#1f7a4d; --flake:#9cc4ee;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg1:#0f1d3d; --bg2:#271445; --ink:#fff3e0; --muted:#d7c4e8; --card:#241a4a; --flake:#ffffff;}
+}
+:root[data-theme="dark"]{--bg1:#0f1d3d; --bg2:#271445; --ink:#fff3e0; --muted:#d7c4e8; --card:#241a4a; --flake:#ffffff;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:"Nunito",system-ui,"Segoe UI",Roboto,sans-serif;background:linear-gradient(180deg,var(--bg1),var(--bg2));background-attachment:fixed;text-align:center;overflow-x:hidden}
+main{position:relative;z-index:2;max-width:520px;margin:0 auto;padding:26px 18px 56px}
+h1{font-family:"Pacifico","Brush Script MT",cursive;font-weight:400;font-size:clamp(2.1rem,10vw,3.3rem);line-height:1.2;margin:.1em 0 .2em;color:var(--red)}
+.sub{margin:0 0 6px;color:var(--muted);font-size:1.05rem}
+.count{font-weight:800;color:var(--green);margin:8px 0 0;min-height:1.5em}
+.tree{width:min(86vw,320px);height:auto;margin:6px auto 0;display:block;overflow:visible}
+.orn{cursor:pointer;transition:transform .15s}
+.orn:hover,.orn:focus-visible{transform:scale(1.18)}
+.orn{transform-box:fill-box;transform-origin:center;outline:none}
+.orn:focus-visible circle{stroke:var(--ink);stroke-width:3}
+.orn.seen circle{opacity:.45}
+.bulb{animation:tw 1.6s infinite alternate}
+@keyframes tw{from{opacity:.3}to{opacity:1}}
+.star{cursor:pointer;transform-box:fill-box;transform-origin:center;animation:spin 6s linear infinite}
+.star:focus-visible{outline:3px solid var(--ink)}
+@keyframes spin{50%{transform:scale(1.15) rotate(12deg)}}
+.msg{background:var(--card);border:3px dashed var(--red);border-radius:24px;padding:18px 20px;margin:14px 0;font-size:1.12rem;line-height:1.5;min-height:110px;display:flex;align-items:center;justify-content:center}
+.msg.pop{animation:pop .4s}
+@keyframes pop{0%{transform:scale(.88) rotate(-2deg)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+button{font:inherit;font-weight:800;font-size:1.05rem;border:0;border-radius:999px;padding:13px 26px;cursor:pointer;color:#fff;background:var(--red);box-shadow:0 5px 0 rgba(0,0,0,.25)}
+button:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+button:disabled{background:#8d8097;cursor:not-allowed}
+button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+@media (prefers-reduced-motion:reduce){.bulb,.star,.msg.pop{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<main>
+  <h1>Selamat Natal, Anya! 🎄</h1>
+  <p class="sub">Pohon ini nyimpen 7 pesan buat kamu. Colek semua ornamennya ya.</p>
+
+  <svg class="tree" viewBox="0 0 300 340" role="group" aria-label="Pohon natal dengan tujuh ornamen">
+    <rect x="132" y="282" width="36" height="42" rx="4" fill="#7a4a2a"/>
+    <path d="M150 70 L52 170 H98 L36 242 H110 L58 296 H242 L190 242 H264 L202 170 H248 Z" fill="var(--green)"/>
+    <path d="M150 70 L98 170 L150 296 L202 170Z" fill="#2a9b63" opacity=".35"/>
+    <g id="bulbs">
+      <circle class="bulb" cx="112" cy="132" r="4" fill="#ffd23f"/><circle class="bulb" cx="190" cy="128" r="4" fill="#ff7fb5" style="animation-delay:.4s"/>
+      <circle class="bulb" cx="84" cy="206" r="4" fill="#7fd0ff" style="animation-delay:.8s"/><circle class="bulb" cx="220" cy="208" r="4" fill="#ffd23f" style="animation-delay:.2s"/>
+      <circle class="bulb" cx="150" cy="224" r="4" fill="#ff7fb5" style="animation-delay:.6s"/><circle class="bulb" cx="120" cy="272" r="4" fill="#7fd0ff" style="animation-delay:1s"/>
+    </g>
+    <g id="orns"></g>
+    <path class="star" id="star" tabindex="0" role="button" aria-label="Bintang di puncak pohon" d="M150 36 l9 20 22 3 -16 15 4 22 -19-11 -19 11 4-22 -16-15 22-3z" fill="var(--gold)" stroke="#e29a00" stroke-width="2"/>
+  </svg>
+  <p class="count" id="count" aria-live="polite">Ornamen terbuka: 0 dari 7</p>
+
+  <div class="msg" id="msg" aria-live="polite">Mulai dari ornamen mana saja, Anya. Tidak ada yang salah. Kecuali kalau dilewatin, itu baru salah.</div>
+
+  <button id="gift" disabled>🎁 Kado terkunci</button>
+</main>
+
+<script>
+(function(){
+  var notes=[
+    "Semoga dompetmu setebal pohon natal ini, dan nggak segundul pohonnya pas hiasannya dicopot.",
+    "Kamu itu kayak lampu natal: bikin suasana hangat. Dan kalau kamu padam satu, semua orang langsung bingung.",
+    "Semoga kamu bisa traveling ke mana pun langkahmu membawa, Anya. Tiket promo selalu ketemu, koper nggak pernah overweight, dan di mana pun kamu mendarat, selalu ada yang diam-diam bangga sama kamu dari jauh. Oleh-olehnya jangan lupa ya 😜",
+    "Terima kasih sudah jadi orang yang bikin hari biasa terasa seperti malam Natal.",
+    "Semoga semua doamu dijawab, terutama yang kamu bisikkan pelan dan nggak kamu ceritakan ke siapa-siapa.",
+    "Wish list-ku buat kamu: sehat, bahagia, dan kuota internet yang nggak pernah habis di tanggal tua.",
+    "Kalau Santa kehabisan hadiah, tenang, aku siap jadi cadangan. Isinya cuma doa dan kerupuk, tapi tulus."
+  ];
+  var pos=[[150,118],[104,178],[196,176],[78,238],[150,244],[222,238],[116,284]];
+  var cols=["#d4264a","#f5b700","#2f6bff","#d4264a","#a855f7","#f5b700","#2f6bff"];
+  var NS="http://www.w3.org/2000/svg",seen={},n=0;
+  var $=function(i){return document.getElementById(i)};
+  var g=$("orns");
+
+  function say(t){var m=$("msg");m.textContent=t;m.classList.remove("pop");void m.offsetWidth;m.classList.add("pop")}
+
+  function open(i,el){
+    say(notes[i]);
+    if(!seen[i]){
+      seen[i]=1;n++;el.classList.add("seen");
+      $("count").textContent="Ornamen terbuka: "+n+" dari 7";
+      if(n===7){
+        $("gift").disabled=false;$("gift").textContent="🎁 Buka kado";
+        $("count").textContent="Semua ornamen terbuka! Kadonya sudah bisa dibuka.";
+        snowBurst(120);
+      }
+    }
+  }
+  pos.forEach(function(p,i){
+    var o=document.createElementNS(NS,"g");
+    o.setAttribute("class","orn");o.setAttribute("tabindex","0");o.setAttribute("role","button");
+    o.setAttribute("aria-label","Ornamen "+(i+1));
+    o.innerHTML='<line x1="'+p[0]+'" y1="'+(p[1]-18)+'" x2="'+p[0]+'" y2="'+(p[1]-12)+'" stroke="#e8c36a" stroke-width="2"/>'+
+      '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="13" fill="'+cols[i]+'"/>'+
+      '<circle cx="'+(p[0]-4)+'" cy="'+(p[1]-4)+'" r="3.5" fill="#fff" opacity=".7"/>';
+    o.addEventListener("click",function(){open(i,o)});
+    o.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open(i,o)}});
+    g.appendChild(o);
+  });
+
+  var star=$("star");
+  function starSay(){say("Bintang ini bilang: kamu bersinar, Anya, meskipun belum ngopi.");snowBurst(60)}
+  star.addEventListener("click",starSay);
+  star.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();starSay()}});
+
+  $("gift").addEventListener("click",function(){
+    say("Hadiah terbaik tahun ini bukan di bawah pohon, Anya, tapi orang-orang yang menyayangimu. Dan kamu salah satu yang paling disayang. Selamat Natal! 💝");
+    $("gift").textContent="🎄 Selamat Natal, Anya!";
+    snowBurst(200,true);
+  });
+
+  /* salju dan konfeti */
+  var cv=$("fx"),cx=cv.getContext("2d"),flakes=[],bits=[];
+  var still=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  function size(){cv.width=innerWidth;cv.height=innerHeight}
+  size();addEventListener("resize",size);
+  function flakeColor(){return getComputedStyle(document.documentElement).getPropertyValue("--flake").trim()||"#fff"}
+  if(!still){for(var i=0;i<70;i++)flakes.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:1.5+Math.random()*3,v:.4+Math.random()*1.1,s:Math.random()*6})}
+  function snowBurst(k,hearts){
+    if(still)return;
+    var c=["#d4264a","#f5b700","#2f6bff","#2a9b63","#ff7fb5"];
+    for(var i=0;i<k;i++)bits.push({x:Math.random()*cv.width,y:-10-Math.random()*cv.height*.3,vx:(Math.random()-.5)*2.5,vy:2+Math.random()*3,r:5+Math.random()*5,a:Math.random()*6,va:(Math.random()-.5)*.25,c:c[i%c.length],h:hearts&&i%3===0});
+  }
+  function tick(){
+    cx.clearRect(0,0,cv.width,cv.height);
+    cx.fillStyle=flakeColor();cx.globalAlpha=.85;
+    flakes.forEach(function(f){
+      f.y+=f.v;f.s+=.02;f.x+=Math.sin(f.s)*.5;
+      if(f.y>cv.height+5){f.y=-5;f.x=Math.random()*cv.width}
+      cx.beginPath();cx.arc(f.x,f.y,f.r,0,6.3);cx.fill();
+    });
+    cx.globalAlpha=1;
+    bits=bits.filter(function(b){return b.y<cv.height+20});
+    bits.forEach(function(b){
+      b.x+=b.vx;b.y+=b.vy;b.a+=b.va;
+      cx.save();cx.translate(b.x,b.y);cx.rotate(b.a);cx.fillStyle=b.c;
+      if(b.h){cx.font=(b.r*3)+"px serif";cx.fillText("❤",-b.r,b.r)}else cx.fillRect(-b.r/2,-b.r/2,b.r,b.r*1.5);
+      cx.restore();
+    });
+    requestAnimationFrame(tick);
+  }
+  if(!still)requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
